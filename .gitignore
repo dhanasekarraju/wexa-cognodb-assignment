@@ -1,0 +1,70 @@
+# Created by .ignore support plugin (hsz.mojo)
+### Maven ###
+target/
+!.mvn/wrapper/
+!.mvn/wrapper/MavenWrapperProperties.xml
+### Spring ###
+*.log
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+### NetBeans ###
+ nbproject/private/
+*.nbattrs
+*.nbactions
+*.nbconfig
+### Visual Studio Code ###
+.vscode/
+*.code-workspace
+### Mac OS ###
+.DS_Store
+### Java ###
+*.class
+### Package Files ###
+*.jar
+*.war
+*.ear
+### Virtual Machine Crash Dumps (BSD) ###
+core.depends
+### Virtual Machine Crash Dumps (Mac) ###
+core.pids
+### Virtual Machine Crash Dumps (Unix) ###
+core
+### Virtual Machine Crash Dumps (Windows NT) ###
+dump.core
+### Virtual Machine Crash Dumps (Windows) ###
+dump.mdmp
+### Virtual Machine Crash Dumps (Windows) ###
+dump.dmp
+### Kotlin ###
+*.kotlin
+*.kt
+### Metadata ###
+**/index
+**/v1/*/.*
+!**/v1/*/.*/
+### Operating System Files ###
+Thumbs.db
+ehthumbs_up.txt
+ehthumbs_down.txt
+### Lynx MK ###
+lyxdir_conversions
+lyxdir_tmp
+lyxdir_bak
+lyxdir_buffer
+lyxdir_auto
+### Environment Variables ###
+.env
+.env.local
+.env.development
+.env.test
+.env.production
