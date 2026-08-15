@@ -141,25 +141,26 @@ The application reads CognoDB connection details from environment variables:
    ```bash
    cd frontend
    ```
-3. Install dependencies:
+2. Install dependencies:
    ```bash
    npm install
    ```
-4. Start the development server:
+3. Start the development server:
    ```bash
    npm run dev
    ```
-5. Or build for production:
+4. Or build for production:
    ```bash
    npm run build
    ```
-6. Preview the production build:
+5. Preview the production build:
    ```bash
    npm run preview
    ```
 
-### Docker (Alternative)
-The application can be run using Docker Compose if configured appropriately.
+### Docker
+
+The backend includes a multi-stage Dockerfile using Maven and Eclipse Temurin Java 21. It can be built and run as a container for deployment environments such as Render.
 
 ## API Endpoints
 
