@@ -111,7 +111,7 @@ const NetworkExplorer = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`/api/people/${personId}/network`);
+      const response = await fetch(`${API_BASE_URL}/api/people/${personId}/network`);
       if (!response.ok) {
         throw new Error(`Failed to fetch person network: ${response.status}`);
       }
