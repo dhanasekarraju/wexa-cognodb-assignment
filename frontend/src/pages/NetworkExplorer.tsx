@@ -116,8 +116,18 @@ const NetworkExplorer = () => {
         throw new Error(`Failed to fetch person network: ${response.status}`);
       }
       const data = await response.json();
-      // Assuming the API returns { nodes: [], links: [] }
-      setGraphData(data);
+
+      const normalizedGraphData = {
+        nodes: data.nodes ?? [],
+        links: (data.relationships ?? []).map((relationship: any) => ({
+          ...relationship,
+          source: relationship.startNodeId,
+          target: relationship.endNodeId,
+          type: relationship.type
+        }))
+      };
+
+      setGraphData(normalizedGraphData);
       setSelectedPersonId(personId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while fetching person network');
