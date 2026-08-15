@@ -4,8 +4,8 @@
 .idea
 .vscode
 target
-frontend/frontend/node_modules
-frontend/frontend/dist
+frontend/node_modules
+frontend/dist
 *.log
 .env
 .env.*

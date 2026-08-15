@@ -117,7 +117,7 @@ The application reads CognoDB connection details from environment variables:
 ### Frontend
 1. Navigate to the frontend directory:
    ```bash
-   cd frontend/frontend
+   cd frontend
    ```
 3. Install dependencies:
    ```bash
