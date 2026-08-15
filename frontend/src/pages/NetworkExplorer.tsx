@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ForceGraph2D from 'react-force-graph-2d';
 import { API_BASE_URL } from '../services/api';
@@ -36,6 +36,9 @@ interface GraphLink {
 }
 
 const NetworkExplorer = () => {
+  const graphContainerRef = useRef<HTMLDivElement>(null);
+  const [graphWidth, setGraphWidth] = useState(800);
+
   const [stats, setStats] = useState<Stats>({
     totalNodes: 0,
     totalRelationships: 0,
@@ -136,6 +139,22 @@ const NetworkExplorer = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const container = graphContainerRef.current;
+    if (!container) return;
+
+    const updateWidth = () => {
+      setGraphWidth(container.clientWidth);
+    };
+
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, [selectedPersonId]);
 
   useEffect(() => {
     fetchNetworkStats();
@@ -254,8 +273,10 @@ const NetworkExplorer = () => {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Network for {samplePeople.find(p => p.id === selectedPersonId)?.name || 'Selected Person'}
           </h2>
-          <div className="h-[500px] w-full">
+          <div ref={graphContainerRef} className="h-[420px] w-full max-w-4xl mx-auto rounded-lg border border-gray-100">
             <ForceGraph2D
+              width={graphWidth}
+              height={420}
               graphData={graphData}
               nodeId="id"
               nodeRelSize={4}
