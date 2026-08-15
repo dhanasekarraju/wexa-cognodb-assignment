@@ -2,11 +2,33 @@
 
 A complete talent graph application built with Spring Boot and CognoDB (Neo4j) backend and React/Vite/TypeScript frontend that demonstrates genuine graph database modeling for talent management.
 
+
+## Live Application
+
+- **Frontend:** https://wexa-talentgraph.vercel.app
+- **Backend:** https://wexa-cognodb-assignment-8g5d.onrender.com
+- **Health Check:** https://wexa-cognodb-assignment-8g5d.onrender.com/health
+
+> The Render backend may require a short cold start after inactivity.
+
+
 ## Overview
 
 TalentGraph is a full-stack application that showcases the power of graph databases for talent management use cases. The application models people, skills, projects, companies, and domains as interconnected nodes in a graph, enabling efficient traversal and querying of complex relationships that would be difficult with traditional relational databases.
 
 ## Architecture
+
+TalentGraph follows a three-tier architecture:
+
+Frontend: Vercel (React + TypeScript + Vite)
+
+↓ HTTPS / REST
+
+Backend: Render (Spring Boot + Java)
+
+↓ Bolt Protocol
+
+Database: CognoDB (Graph Database)
 
 ### Backend
 - **Language**: Java 21
@@ -44,13 +66,13 @@ TalentGraph is a full-stack application that showcases the power of graph databa
 ### Frontend Features
 - Responsive design with Tailwind CSS
 - Client-side routing with React Router
-- Six main pages:
+- Seven main pages:
   1. **Overview** - Statistics dashboard with links to all sections
   2. **Projects** - List all projects with navigation to details
   3. **Project Detail** - Project information, talent recommendations, and explanation
   4. **Talent Explorer** - Search and filter capabilities for people
   5. **Person Detail** - Overview, similar people, and professional network tabs
-  6. **Network Explorer** - Network statistics and sample data visualization
+  6. **Network Explorer** - Interactive force-directed graph, network statistics, and relationship exploration
   7. **Why Graph** - Educational page about graph database advantages
 - Interactive components with loading states and error handling
 - Consumption of all backend API endpoints
