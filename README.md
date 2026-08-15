@@ -1,6 +1,6 @@
 # TalentGraph
 
-A complete talent graph application built with Spring Boot and CognoDB (Neo4j) backend and React/Vite/TypeScript frontend that demonstrates genuine graph database modeling for talent management.
+A complete talent graph application built with Spring Boot backend, CognoDB graph database, and React/Vite/TypeScript frontend that demonstrates genuine graph database modeling for talent management.
 
 
 ## Live Application
@@ -92,7 +92,7 @@ Database: CognoDB (Graph Database)
 - **Vite** build tool
 - **Tailwind CSS** for styling
 - **React Router DOM** for client-side navigation
-- **Axios/Fetch API** for HTTP communication
+- **Fetch API** for HTTP communication
 
 ## Setup Prerequisites
 
