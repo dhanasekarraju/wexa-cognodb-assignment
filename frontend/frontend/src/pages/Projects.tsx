@@ -26,6 +26,42 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
+  // Helper function to convert status enum to readable text
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case 'IN_PROGRESS':
+        return 'In Progress';
+      case 'PLANNING':
+        return 'Planning';
+      case 'COMPLETED':
+        return 'Completed';
+      case 'ON_HOLD':
+        return 'On Hold';
+      case 'CANCELLED':
+        return 'Cancelled';
+      default:
+        return status;
+    }
+  };
+
+  // Helper function to get status badge color
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case 'IN_PROGRESS':
+        return 'bg-blue-100 text-blue-800';
+      case 'PLANNING':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'COMPLETED':
+        return 'bg-green-100 text-green-800';
+      case 'ON_HOLD':
+        return 'bg-gray-100 text-gray-800';
+      case 'CANCELLED':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
@@ -62,17 +98,21 @@ const Projects = () => {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project: any) => (
-            <Link key={project.id} to={`/projects/${project.id}`} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{project.name}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-3">{project.description}</p>
-                <div className="flex items-center text-sm text-gray-500">
-                  <span className="mr-3">
-                    <svg className="h-4 w-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3" />
-                    </svg>
-                  </span>
-                  Status: {project.status}
+            <Link key={project.id} to={`/projects/${project.id}`} className="block hover:shadow-lg transition-shadow">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{project.name}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-3">{project.description}</p>
+                  <div className="flex items-center text-sm">
+                    <span className="mr-3">
+                      <svg className="h-4 w-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3" />
+                      </svg>
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
+                      {getStatusLabel(project.status)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </Link>

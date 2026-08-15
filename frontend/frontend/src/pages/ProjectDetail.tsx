@@ -57,13 +57,17 @@ const ProjectDetail = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-          <p className="font-bold">Error:</p>
+          <p className="font-bold">Error Loading Project Data:</p>
           <p className="mt-1">{error}</p>
-        </div>
-        <div className="mt-6">
-          <Link to="/projects" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
-            Back to Projects
-          </Link>
+          <p className="mt-3">
+            The TalentGraph application could not load project details from the database.
+            This may be due to a connection issue or the requested project not existing.
+          </p>
+          <div className="mt-4">
+            <Link to="/projects" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
+              Back to Projects
+            </Link>
+          </div>
         </div>
       </div>
     );

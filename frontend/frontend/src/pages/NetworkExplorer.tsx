@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ForceGraph2D from 'react-force-graph-2d';
 
 interface NodeType {
   type: string;
@@ -14,101 +15,120 @@ interface RelationshipType {
 interface Stats {
   totalNodes: number;
   totalRelationships: number;
+  networkDensity: number;
   nodeTypes: NodeType[];
   relationshipTypes: RelationshipType[];
 }
 
-interface SampleData {
-  people: any[];
-  projects: any[];
-  skills: any[];
-  companies: any[];
-  domains: any[];
+
+interface GraphNode {
+  id: string | number;
+  label: string;
+  relSize?: number;
+  [key: string]: any;
+}
+
+interface GraphLink {
+  source: string | number;
+  target: string | number;
+  [key: string]: any;
 }
 
 const NetworkExplorer = () => {
   const [stats, setStats] = useState<Stats>({
     totalNodes: 0,
     totalRelationships: 0,
+    networkDensity: 0,
     nodeTypes: [],
     relationshipTypes: [],
   });
-  const [sampleData, setSampleData] = useState<SampleData | null>(null);
+  const [graphData, setGraphData] = useState<{ nodes: GraphNode[]; links: GraphLink[] }>({ nodes: [], links: [] });
+  const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [samplePeople, setSamplePeople] = useState<any[]>([]);
+
+  // Helper to get Tailwind color class for node label (used in lists)
+  const getNodeColorClass = (label: string) => {
+    switch (label) {
+      case 'Person': return 'bg-blue-500';
+      case 'Skill': return 'bg-green-500';
+      case 'Project': return 'bg-purple-500';
+      case 'Company': return 'bg-red-500';
+      case 'Domain': return 'bg-yellow-500';
+      case 'Technology': return 'bg-indigo-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  // ForceGraph node color mapping (must be preserved exactly)
+  const nodeColor = (node: GraphNode) => {
+    switch (node.label) {
+      case 'Person': return '#3b82f6'; // blue-500
+      case 'Skill': return '#10b981'; // green-500
+      case 'Project': return '#a855f7'; // purple-500
+      case 'Company': return '#ef4444'; // red-500
+      case 'Domain': return '#eab308'; // yellow-500
+      case 'Technology': return '#6366f1'; // indigo-500
+      default: return '#6b7280'; // gray-500
+    }
+  };
+
+  // Fetch network statistics from admin endpoint
+  const fetchNetworkStats = async () => {
+    try {
+      const response = await fetch('/api/admin/stats');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch stats: ${response.status}`);
+      }
+      const data: Stats = await response.json();
+      setStats(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching network statistics');
+      console.error('Error fetching network stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch a sample of people for clickable selection
+  const fetchSamplePeople = async () => {
+    try {
+      const response = await fetch('/api/people?limit=6');
+      if (!response.ok) {
+        throw new Error('Failed to fetch sample people');
+      }
+      const data = await response.json();
+      setSamplePeople(data);
+    } catch (err) {
+      console.error('Error fetching sample people:', err);
+    }
+  };
+
+  // Fetch network for a specific person
+  const fetchPersonNetwork = async (personId: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`/api/people/${personId}/network`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch person network: ${response.status}`);
+      }
+      const data = await response.json();
+      // Assuming the API returns { nodes: [], links: [] }
+      setGraphData(data);
+      setSelectedPersonId(personId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching person network');
+      console.error('Error fetching person network:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchNetworkStats = async () => {
-      try {
-        // We don't have a direct endpoint for network stats, so we'll fetch all entities and compute
-        // In a real implementation, we would have a dedicated endpoint for this
-
-        // Fetch all people
-        const peopleResponse = await fetch('/api/people');
-        const peopleData = await peopleResponse.json();
-
-        // Fetch all projects
-        const projectsResponse = await fetch('/api/projects');
-        const projectsData = await projectsResponse.json();
-
-        // Fetch all skills
-        const skillsResponse = await fetch('/api/skills');
-        const skillsData = await skillsResponse.json();
-
-        // Fetch all companies
-        const companiesResponse = await fetch('/api/companies');
-        const companiesData = await companiesResponse.json();
-
-        // Fetch all domains
-        const domainsResponse = await fetch('/api/domains');
-        const domainsData = await domainsResponse.json();
-
-        // Calculate total nodes
-        const totalNodes =
-          peopleData.length +
-          projectsData.length +
-          skillsData.length +
-          companiesData.length +
-          domainsData.length;
-
-        // For relationships, we don't have a direct way to count without traversing
-        // We'll estimate or show placeholder data
-        setStats({
-          totalNodes: totalNodes,
-          totalRelationships: 0, // Placeholder
-          nodeTypes: [
-            { type: 'Person', count: peopleData.length },
-            { type: 'Project', count: projectsData.length },
-            { type: 'Skill', count: skillsData.length },
-            { type: 'Company', count: companiesData.length },
-            { type: 'Domain', count: domainsData.length },
-          ],
-          relationshipTypes: [ // Placeholder
-            { type: 'HAS_SKILL', count: 0 },
-            { type: 'WORKED_ON', count: 0 },
-            { type: 'WORKS_AT', count: 0 },
-            { type: 'IN_DOMAIN', count: 0 },
-            { type: 'RELATED_TO', count: 0 },
-          ],
-        });
-
-        // Get a sample of the data for display
-        setSampleData({
-          people: peopleData.slice(0, 5),
-          projects: projectsData.slice(0, 5),
-          skills: skillsData.slice(0, 5),
-          companies: companiesData.slice(0, 5),
-          domains: domainsData.slice(0, 5),
-        });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching network data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchNetworkStats();
+    fetchSamplePeople();
   }, []);
 
   if (loading) {
@@ -156,10 +176,15 @@ const NetworkExplorer = () => {
             <p className="text-3xl font-bold text-gray-900">{stats.totalRelationships}</p>
           </div>
 
-          {/* Density (placeholder) */}
-          <div className="text-center">
-            <p className="text-sm font-medium text-gray-500">Network Density</p>
-            <p className="text-3xl font-bold text-gray-900">N/A</p>
+          {/* Network Density */}
+          <div className="text-center space-y-2">
+            <p className="text-sm font-medium text-gray-500">Approx. Network Density</p>
+            <p className="text-3xl font-bold text-gray-900">
+              {(stats.networkDensity * 100).toFixed(2)}%
+            </p>
+            <p className="text-xs text-gray-500">
+              Uses an undirected connectivity approximation for a simple overview.
+            </p>
           </div>
         </div>
       </div>
@@ -190,58 +215,117 @@ const NetworkExplorer = () => {
         </div>
       </div>
 
-      {/* Sample Data */}
-      {sampleData && (
+      {/* Person Selection */}
+      {selectedPersonId === null && samplePeople.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Explore Sample Networks</h2>
+          <p className="text-gray-600 mb-4">
+            Click on a person below to view their network in the graph.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            {samplePeople.map((person) => (
+              <div
+                key={person.id}
+                onClick={() => fetchPersonNetwork(person.id)}
+                className="cursor-pointer bg-blue-50 hover:bg-blue-100 p-3 rounded border border-blue-200 transition-colors"
+              >
+                <div className="font-medium">{person.name}</div>
+                <div className="text-sm text-gray-500">{person.title}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Graph Section */}
+      {selectedPersonId !== null && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Network for {samplePeople.find(p => p.id === selectedPersonId)?.name || 'Selected Person'}
+          </h2>
+          <div className="h-[500px] w-full">
+            <ForceGraph2D
+              graphData={graphData}
+              nodeId="id"
+              nodeRelSize={4}
+              nodeColor={nodeColor}
+              linkSource="source"
+              linkTarget="target"
+              linkWidth={1.5}
+              linkColor="#999"
+              onNodeClick={(node) => {
+                // Optionally handle node click (e.g., show details)
+                console.log('Node clicked:', node);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Legend */}
+      {selectedPersonId !== null && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Legend</h2>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+              <span>Person</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+              <span>Skill</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-purple-500 mr-2"></div>
+              <span>Project</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+              <span>Company</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+              <span>Domain</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full bg-indigo-500 mr-2"></div>
+              <span>Technology</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Nodes List */}
+      {selectedPersonId !== null && graphData.nodes.length > 0 && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Nodes ({graphData.nodes.length})</h2>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            {graphData.nodes.map((node) => (
+              <div key={node.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div className="flex items-center">
+                  <div className={`w-3 h-3 rounded-full ${getNodeColorClass(node.label)} mr-3`}></div>
+                  <span className="font-medium">{node.id}</span>
+                </div>
+                <span className="text-sm text-gray-500">{node.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Relationships List */}
+      {selectedPersonId !== null && graphData.links.length > 0 && (
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Sample Data</h2>
-          <div className="space-y-6">
-            {/* People Sample */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">People (Sample)</h3>
-              {sampleData.people.length > 0 ? (
-                <ul className="list-disc list-inset space-y-2">
-                  {sampleData.people.map((person: any, index: number) => (
-                    <li key={index}>
-                      {person.name} ({person.title})
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">No people data</p>
-              )}
-            </div>
-
-            {/* Projects Sample */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Projects (Sample)</h3>
-              {sampleData.projects.length > 0 ? (
-                <ul className="list-disc list-inset space-y-2">
-                  {sampleData.projects.map((project: any, index: number) => (
-                    <li key={index}>
-                      {project.name} ({project.status})
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">No projects data</p>
-              )}
-            </div>
-
-            {/* Skills Sample */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Skills (Sample)</h3>
-              {sampleData.skills.length > 0 ? (
-                <ul className="list-disc list-inset space-y-2">
-                  {sampleData.skills.map((skill: any, index: number) => (
-                    <li key={index}>
-                      {skill.name} ({skill.category})
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500">No skills data</p>
-              )}
-            </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Relationships ({graphData.links.length})</h2>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            {graphData.links.map((link, index) => (
+              <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <span className="font-medium">
+                  {link.source} → {link.target}
+                </span>
+                <span className="text-sm text-gray-500">{link.type ?? 'related'}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}

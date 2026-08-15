@@ -9,6 +9,7 @@ const Overview = () => {
     companies: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Fetch statistics from the API
@@ -16,21 +17,33 @@ const Overview = () => {
       try {
         // Fetch people count
         const peopleResponse = await fetch('/api/people');
+        if (!peopleResponse.ok) {
+          throw new Error(`Failed to fetch people: ${peopleResponse.status}`);
+        }
         const peopleData = await peopleResponse.json();
         const peopleCount = peopleData.length;
 
         // Fetch projects count
         const projectsResponse = await fetch('/api/projects');
+        if (!projectsResponse.ok) {
+          throw new Error(`Failed to fetch projects: ${projectsResponse.status}`);
+        }
         const projectsData = await projectsResponse.json();
         const projectsCount = projectsData.length;
 
         // Fetch skills count
         const skillsResponse = await fetch('/api/skills');
+        if (!skillsResponse.ok) {
+          throw new Error(`Failed to fetch skills: ${skillsResponse.status}`);
+        }
         const skillsData = await skillsResponse.json();
         const skillsCount = skillsData.length;
 
         // Fetch companies count
         const companiesResponse = await fetch('/api/companies');
+        if (!companiesResponse.ok) {
+          throw new Error(`Failed to fetch companies: ${companiesResponse.status}`);
+        }
         const companiesData = await companiesResponse.json();
         const companiesCount = companiesData.length;
 
@@ -40,8 +53,10 @@ const Overview = () => {
           skills: skillsCount,
           companies: companiesCount,
         });
+        setError(null);
       } catch (error) {
         console.error('Error fetching stats:', error);
+        setError(error instanceof Error ? error.message : 'An error occurred while fetching statistics');
       } finally {
         setLoading(false);
       }
@@ -59,6 +74,27 @@ const Overview = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <p className="font-bold">Error Loading Statistics:</p>
+          <p className="mt-1">{error}</p>
+          <p className="mt-3">
+            The TalentGraph application could not load statistics from the database.
+            This may be due to a connection issue or the backend service being unavailable.
+          </p>
+          <div className="mt-4">
+            <Link to="/" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
+              Try Again
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Only show zero stats if there's no error (meaning we successfully fetched data)
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-8">
@@ -91,7 +127,7 @@ const Overview = () => {
           <div className="flex items-center">
             <div className="p-3 bg-blue-100 rounded-full">
               <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 7v9a2 2 0 002 2h10l2-2-2-2-2-2V7zm-1-4h10a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2a2 2 0 012-2zm0 0l2-2m-2 2l2 2M3 9h14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 7v9a2 2 0 002 2h10l2-2-2-2-2-2V7zm-1-4h10a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2 2v-2a2 2 0 012-2zm0 0l2-2m-2 2l2 2M3 9h14" />
               </svg>
             </div>
             <div className="ml-4">
@@ -121,7 +157,7 @@ const Overview = () => {
           <div className="flex items-center">
             <div className="p-3 bg-purple-100 rounded-full">
               <svg className="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zm0-6c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zm0 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2z" />
               </svg>
             </div>
             <div className="ml-4">

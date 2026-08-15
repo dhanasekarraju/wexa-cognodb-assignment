@@ -83,8 +83,17 @@ const TalentExplorer = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-          <p className="font-bold">Error:</p>
+          <p className="font-bold">Error Loading Talent Data:</p>
           <p className="mt-1">{error}</p>
+          <p className="mt-3">
+            The TalentGraph application could not load talent data from the database.
+            This may be due to a connection issue or the backend service being unavailable.
+          </p>
+          <div className="mt-4">
+            <Link to="/" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded">
+              Try Again
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -116,14 +125,14 @@ const TalentExplorer = () => {
             />
           </div>
 
-          {/* Skills Multi-select (simplified as checkboxes for now) */}
+          {/* Skills Multi-select - Improved UI */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Skills
             </label>
-            <div className="space-y-1 max-h-[200px] overflow-y-auto">
-              {allSkills.map((skill) => (
-                <div key={skill} className="flex items-center">
+            <div className="space-y-2 max-h-[200px] overflow-y-auto pb-2">
+              {allSkills.map((skill, index) => (
+                <div key={index} className="flex items-center p-2 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
                   <input
                     type="checkbox"
                     value={skill}
@@ -138,6 +147,10 @@ const TalentExplorer = () => {
                     className="h-4 w-4 text-indigo-600"
                   />
                   <span className="ml-2 text-sm">{skill}</span>
+                  {/* Show selected indicator */}
+                  {selectedSkills.includes(skill) && (
+                    <span className="ml-auto text-xs text-indigo-600">✓</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -148,26 +161,46 @@ const TalentExplorer = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Minimum Experience (years)
             </label>
-            <input
-              type="number"
-              value={minExperience}
-              onChange={(e) => setMinExperience(parseInt(e.target.value) || 0)}
-              min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                value={minExperience}
+                onChange={(e) => setMinExperience(parseInt(e.target.value) || 0)}
+                min="0"
+                className="w-[80px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <span className="text-sm text-gray-500">years</span>
+            </div>
           </div>
         </div>
 
-        {/* Reset Filters Button */}
-        <div className="flex items-end">
+        {/* Active Filters Summary */}
+        {(selectedSkills.length > 0 || minExperience > 0 || searchTerm.trim() !== '') && (
+          <div className="mt-4 p-3 bg-indigo-50 rounded-lg border-l-4 border-indigo-500">
+            <p className="text-sm font-medium text-indigo-800 flex items-center">
+              <span className="mr-2">Active filters:</span>
+              <span className="text-indigo-600">
+                {searchTerm && `Search: "${searchTerm}" `}
+                {selectedSkills.length > 0 && `Skills: ${selectedSkills.join(', ')} `}
+                {minExperience > 0 && `Experience: ${minExperience}+ years`}
+              </span>
+            </p>
+          </div>
+        )}
+
+        {/* Reset Filters Button - Improved Affordance */}
+        <div className="flex justify-end mt-4">
           <button
             onClick={() => {
               setSearchTerm('');
               setSelectedSkills([]);
               setMinExperience(0);
             }}
-            className="text-sm text-indigo-600 hover:text-indigo-800"
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           >
+            <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
             Reset Filters
           </button>
         </div>
@@ -183,16 +216,23 @@ const TalentExplorer = () => {
       {/* People List */}
       {filteredPeople.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">No people match the current filters.</p>
+          <div className="space-y-4">
+            <p className="text-gray-500">No people match the current filters.</p>
+            {selectedSkills.length > 0 || minExperience > 0 || searchTerm.trim() !== '' && (
+              <p className="text-sm text-gray-400">
+                Try adjusting your filters to see more results.
+              </p>
+            )}
+          </div>
         </div>
       ) : (
         <div className="space-y-6">
           {filteredPeople.map((person) => (
-            <div key={person.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div key={person.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
               <div className="p-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <Link to={`/person/${person.id}`} className="text-lg font-semibold text-gray-900 hover:text-indigo-600">
+                    <Link to={`/person/${person.id}`} className="text-lg font-semibold text-gray-900 hover:text-indigo-600 group-hover:text-indigo-600">
                       {person.name}
                     </Link>
                     <p className="text-gray-600 mt-1">{person.title}</p>
@@ -209,13 +249,13 @@ const TalentExplorer = () => {
                   <div className="flex space-x-3">
                     <Link
                       to={`/person/${person.id}/similar`}
-                      className="px-3 py-1.5 text-sm font-medium bg-indigo-100 text-indigo-800 rounded hover:bg-indigo-200"
+                      className="flex items-center px-3 py-1.5 text-sm font-medium bg-indigo-50 text-indigo-100 hover:bg-indigo-100 hover:text-indigo-800 rounded transition-colors"
                     >
                       Similar
                     </Link>
                     <Link
                       to={`/person/${person.id}/network`}
-                      className="px-3 py-1.5 text-sm font-medium bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+                      className="flex items-center px-3 py-1.5 text-sm font-medium bg-gray-50 text-gray-100 hover:bg-gray-100 hover:text-gray-800 rounded transition-colors"
                     >
                       Network
                     </Link>
