@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ForceGraph2D from 'react-force-graph-2d';
+import { API_BASE_URL } from '../services/api';
 
 interface NodeType {
   type: string;
@@ -77,7 +78,7 @@ const NetworkExplorer = () => {
   // Fetch network statistics from admin endpoint
   const fetchNetworkStats = async () => {
     try {
-      const response = await fetch('/api/admin/stats');
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats`);
       if (!response.ok) {
         throw new Error(`Failed to fetch stats: ${response.status}`);
       }
@@ -94,7 +95,7 @@ const NetworkExplorer = () => {
   // Fetch a sample of people for clickable selection
   const fetchSamplePeople = async () => {
     try {
-      const response = await fetch('/api/people?limit=6');
+      const response = await fetch(`${API_BASE_URL}/api/people?limit=6`);
       if (!response.ok) {
         throw new Error('Failed to fetch sample people');
       }

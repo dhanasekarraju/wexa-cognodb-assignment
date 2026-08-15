@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../services/api';
 
 const Overview = () => {
   const [stats, setStats] = useState({
@@ -16,7 +17,7 @@ const Overview = () => {
     const fetchStats = async () => {
       try {
         // Fetch people count
-        const peopleResponse = await fetch('/api/people');
+        const peopleResponse = await fetch(`${API_BASE_URL}/api/people`);
         if (!peopleResponse.ok) {
           throw new Error(`Failed to fetch people: ${peopleResponse.status}`);
         }
@@ -24,7 +25,7 @@ const Overview = () => {
         const peopleCount = peopleData.length;
 
         // Fetch projects count
-        const projectsResponse = await fetch('/api/projects');
+        const projectsResponse = await fetch(`${API_BASE_URL}/api/projects`);
         if (!projectsResponse.ok) {
           throw new Error(`Failed to fetch projects: ${projectsResponse.status}`);
         }
@@ -32,7 +33,7 @@ const Overview = () => {
         const projectsCount = projectsData.length;
 
         // Fetch skills count
-        const skillsResponse = await fetch('/api/skills');
+        const skillsResponse = await fetch(`${API_BASE_URL}/api/skills`);
         if (!skillsResponse.ok) {
           throw new Error(`Failed to fetch skills: ${skillsResponse.status}`);
         }
@@ -40,7 +41,7 @@ const Overview = () => {
         const skillsCount = skillsData.length;
 
         // Fetch companies count
-        const companiesResponse = await fetch('/api/companies');
+        const companiesResponse = await fetch(`${API_BASE_URL}/api/companies`);
         if (!companiesResponse.ok) {
           throw new Error(`Failed to fetch companies: ${companiesResponse.status}`);
         }

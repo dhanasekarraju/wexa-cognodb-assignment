@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../services/api';
 
 const PersonDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +16,7 @@ const PersonDetail = () => {
     const fetchPersonData = async () => {
       try {
         // Fetch person details
-        const personResponse = await fetch(`/api/people/${id}`);
+        const personResponse = await fetch(`${API_BASE_URL}/api/people/${id}`);
         if (!personResponse.ok) {
           if (personResponse.status === 404) {
             navigate('/talent');
@@ -27,7 +28,7 @@ const PersonDetail = () => {
         setPerson(personData);
 
         // Fetch similar people
-        const similarResponse = await fetch(`/api/people/${id}/similar`);
+        const similarResponse = await fetch(`${API_BASE_URL}/api/people/${id}/similar`);
         if (!similarResponse.ok) {
           throw new Error('Failed to fetch similar people');
         }
@@ -35,7 +36,7 @@ const PersonDetail = () => {
         setSimilarPeople(similarData);
 
         // Fetch network data
-        const networkResponse = await fetch(`/api/people/${id}/network`);
+        const networkResponse = await fetch(`${API_BASE_URL}/api/people/${id}/network`);
         if (!networkResponse.ok) {
           throw new Error('Failed to fetch network data');
         }

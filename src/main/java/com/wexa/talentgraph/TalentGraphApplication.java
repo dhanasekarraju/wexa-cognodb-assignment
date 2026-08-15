@@ -15,9 +15,15 @@ public class TalentGraphApplication {
     @Bean
     public CommandLineRunner initData(SeedDataService seedDataService) {
         return args -> {
-            System.out.println("Seeding initial data...");
-            seedDataService.seedData();
-            System.out.println("Data seeding completed.");
+            try {
+                System.out.println("Seeding initial data...");
+                seedDataService.seedData();
+                System.out.println("Data seeding completed.");
+            } catch (Exception e) {
+                System.err.println("Error during data seeding: " + e.getMessage());
+                e.printStackTrace();
+                // Continue application startup even if seed fails
+            }
         };
     }
 }

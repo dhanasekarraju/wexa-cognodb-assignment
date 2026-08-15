@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../services/api';
 
 const TalentExplorer = () => {
   const [people, setPeople] = useState<any[]>([]);
@@ -15,7 +16,7 @@ const TalentExplorer = () => {
     const fetchPeopleAndSkills = async () => {
       try {
         // Fetch all people
-        const peopleResponse = await fetch('/api/people');
+        const peopleResponse = await fetch(`${API_BASE_URL}/api/people`);
         if (!peopleResponse.ok) {
           throw new Error('Failed to fetch people');
         }
@@ -24,7 +25,7 @@ const TalentExplorer = () => {
         setFilteredPeople(peopleData);
 
         // Fetch all skills to populate the filter dropdown
-        const skillsResponse = await fetch('/api/skills');
+        const skillsResponse = await fetch(`${API_BASE_URL}/api/skills`);
         if (!skillsResponse.ok) {
           throw new Error('Failed to fetch skills');
         }

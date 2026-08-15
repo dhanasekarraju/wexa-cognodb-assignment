@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../services/api';
 
 const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +14,7 @@ const ProjectDetail = () => {
     const fetchProjectData = async () => {
       try {
         // Fetch project details
-        const projectResponse = await fetch(`/api/projects/${id}`);
+        const projectResponse = await fetch(`${API_BASE_URL}/api/projects/${id}`);
         if (!projectResponse.ok) {
           if (projectResponse.status === 404) {
             navigate('/projects');
@@ -25,7 +26,7 @@ const ProjectDetail = () => {
         setProject(projectData);
 
         // Fetch talent recommendations for this project
-        const recommendationsResponse = await fetch(`/api/projects/${id}/recommendations`);
+        const recommendationsResponse = await fetch(`${API_BASE_URL}/api/projects/${id}/recommendations`);
         if (!recommendationsResponse.ok) {
           throw new Error('Failed to fetch recommendations');
         }
