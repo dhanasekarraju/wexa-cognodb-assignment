@@ -250,13 +250,13 @@ const TalentExplorer = () => {
                   <div className="flex space-x-3">
                     <Link
                       to={`/person/${person.id}/similar`}
-                      className="flex items-center px-3 py-1.5 text-sm font-medium bg-indigo-50 text-indigo-100 hover:bg-indigo-100 hover:text-indigo-800 rounded transition-colors"
+                      className="flex items-center px-3 py-1.5 text-sm font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800 rounded transition-colors"
                     >
                       Similar
                     </Link>
                     <Link
                       to={`/person/${person.id}/network`}
-                      className="flex items-center px-3 py-1.5 text-sm font-medium bg-gray-50 text-gray-100 hover:bg-gray-100 hover:text-gray-800 rounded transition-colors"
+                      className="flex items-center px-3 py-1.5 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 rounded transition-colors"
                     >
                       Network
                     </Link>

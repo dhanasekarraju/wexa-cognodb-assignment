@@ -1,16 +1,31 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { API_BASE_URL } from '../services/api';
 
 const PersonDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [person, setPerson] = useState<any>(null);
   const [similarPeople, setSimilarPeople] = useState<any[]>([]);
   const [networkData, setNetworkData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'similar' | 'network'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'similar' | 'network'>(() => {
+    if (location.pathname.endsWith('/similar')) return 'similar';
+    if (location.pathname.endsWith('/network')) return 'network';
+    return 'overview';
+  });
+
+  useEffect(() => {
+    if (location.pathname.endsWith('/similar')) {
+      setActiveTab('similar');
+    } else if (location.pathname.endsWith('/network')) {
+      setActiveTab('network');
+    } else {
+      setActiveTab('overview');
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchPersonData = async () => {
